@@ -5,7 +5,7 @@ Storage (automatic):
   * a JSON file    -> otherwise (needs a persistent volume, e.g. on Wasmer)
 Works on Vercel, Wasmer, Render, Koyeb... any host that runs Flask.
 """
-import os, json, hmac, hashlib, time, urllib.request
+import os, json, hmac, hashlib, time, ssl, urllib.request
 from flask import Flask, request, jsonify, send_from_directory
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -22,6 +22,19 @@ DATA = os.environ.get("DATA_DIR", "/data")
 FILE = os.path.join(DATA, "scripts.json")
 MAX_REDIS_BYTES = 900_000                           # stay under Upstash's request size limit
 
+def _make_ssl_context():
+    """Some hosts (e.g. Wasmer) have no system CA certificates, so use certifi's bundle."""
+    if os.environ.get("REDIS_SSL_VERIFY") == "0":      # last resort only - NOT recommended
+        return ssl._create_unverified_context()
+    try:
+        import certifi
+        return ssl.create_default_context(cafile=certifi.where())
+    except Exception:
+        return ssl.create_default_context()
+
+
+SSL_CTX = _make_ssl_context()
+
 app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = 8 * 1024 * 1024
 
@@ -31,7 +44,7 @@ def rcmd(*cmd):
     req = urllib.request.Request(
         RURL, data=json.dumps(list(cmd)).encode("utf-8"), method="POST",
         headers={"Authorization": "Bearer " + RTOK, "Content-Type": "application/json"})
-    with urllib.request.urlopen(req, timeout=8) as r:
+    with urllib.request.urlopen(req, timeout=8, context=SSL_CTX) as r:
         out = json.loads(r.read().decode("utf-8"))
     if isinstance(out, dict) and out.get("error"):
         raise OSError(out["error"])
