@@ -1,0 +1,14 @@
+# EXAMPLE ONLY. Keep YOUR existing "name", "owner" and other lines.
+# The only thing you must ADD is the "volumes" section (this is what makes scripts survive restarts).
+kind: wasmer.io/App.v0
+name: your-app-name        # <- keep yours
+owner: your-username       # <- keep yours
+package: .
+volumes:
+  - name: data
+    mount: /data
+# Do NOT put your password in this file.
+# Wasmer dashboard -> your app -> Settings -> Environment variables / Secrets:
+#   ADMIN_USER = StudShin
+#   ADMIN_PASS = <your new password>
+#   SECRET     = <any long random text>
