@@ -76,6 +76,81 @@ def store_scripts(items):
     os.replace(tmp, FILE)
 
 
+# ---------- visitor counter ----------
+V_KEY, U_KEY = "studio-shin:views", "studio-shin:uniq"
+STATS_FILE = os.path.join(DATA, "stats.json")
+BOTS = ("bot", "spider", "crawl", "curl", "wget", "python-requests", "slurp", "facebookexternalhit")
+
+
+def rpipe(cmds):
+    req = urllib.request.Request(
+        RURL + "/pipeline", data=json.dumps(cmds).encode("utf-8"), method="POST",
+        headers={"Authorization": "Bearer " + RTOK, "Content-Type": "application/json"})
+    with urllib.request.urlopen(req, timeout=8, context=SSL_CTX) as r:
+        out = json.loads(r.read().decode("utf-8"))
+    res = []
+    for o in out:
+        if isinstance(o, dict) and o.get("error"):
+            raise OSError(o["error"])
+        res.append(o.get("result") if isinstance(o, dict) else None)
+    return res
+
+
+def redis_many(cmds):
+    try:
+        return rpipe(cmds)                      # one request for all commands
+    except Exception:
+        return [rcmd(*c) for c in cmds]         # fallback: one by one
+
+
+def visitor_id():
+    """Anonymous id: salted hash of IP + browser. The raw IP is never stored."""
+    ip = request.headers.get("X-Forwarded-For", "").split(",")[0].strip() or request.remote_addr or ""
+    raw = (SECRET or "salt") + "|" + ip + "|" + request.headers.get("User-Agent", "")
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:20]
+
+
+def is_bot():
+    ua = request.headers.get("User-Agent", "").lower()
+    return (not ua) or any(k in ua for k in BOTS)
+
+
+def _file_stats():
+    try:
+        with open(STATS_FILE, encoding="utf-8") as f:
+            d = json.load(f)
+        return {"views": int(d.get("views", 0)), "seen": list(d.get("seen", []))}
+    except Exception:
+        return {"views": 0, "seen": []}
+
+
+def read_stats():
+    if USE_REDIS:
+        v, u = redis_many([["GET", V_KEY], ["PFCOUNT", U_KEY]])
+        return int(v or 0), int(u or 0)
+    d = _file_stats()
+    return d["views"], len(d["seen"])
+
+
+def bump(vid):
+    if USE_REDIS:
+        v, _, u = redis_many([["INCR", V_KEY], ["PFADD", U_KEY, vid], ["PFCOUNT", U_KEY]])
+        return int(v), int(u)
+    d = _file_stats()
+    d["views"] += 1
+    if vid not in d["seen"] and len(d["seen"]) < 50000:
+        d["seen"].append(vid)
+    try:
+        os.makedirs(DATA, exist_ok=True)
+        tmp = STATS_FILE + ".tmp"
+        with open(tmp, "w", encoding="utf-8") as f:
+            json.dump(d, f)
+        os.replace(tmp, STATS_FILE)
+    except OSError:
+        pass
+    return d["views"], len(d["seen"])
+
+
 def token():
     return hmac.new(SECRET.encode(), b"admin-v1", hashlib.sha256).hexdigest()
 
@@ -139,6 +214,25 @@ def save_scripts():
     except Exception as e:
         return jsonify(error="storage: %s" % (getattr(e, "strerror", None) or e)), 500
     return jsonify(ok=True)
+
+
+@app.post("/api/visit")
+def visit():
+    """Called once per browser tab session. Owner (logged in) and bots are not counted."""
+    try:
+        v, u = read_stats() if (authed() or is_bot()) else bump(visitor_id())
+    except Exception:
+        return jsonify(error="stats"), 502
+    return jsonify(views=v, unique=u)
+
+
+@app.get("/api/stats")
+def stats():
+    try:
+        v, u = read_stats()
+    except Exception:
+        return jsonify(error="stats"), 502
+    return jsonify(views=v, unique=u)
 
 
 @app.get("/api/health")
