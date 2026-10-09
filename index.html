@@ -162,6 +162,16 @@ footer{padding:18px 0}
 .view{height:440px}
 }
 #scripts{scroll-margin-top:76px}
+.vis{display:inline-flex;align-items:center;gap:8px;margin-top:16px;padding:7px 16px;border:1px solid var(--line);border-radius:999px;background:color-mix(in srgb,var(--panel) 70%,transparent);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);font:500 .82rem "JetBrains Mono",ui-monospace,monospace;color:var(--mute);flex-wrap:wrap;justify-content:center}
+.vis[hidden]{display:none}
+.vis b{color:var(--text);font-weight:600}
+.vis .dot{width:8px;height:8px;border-radius:50%;background:var(--acc);box-shadow:0 0 10px var(--acc);animation:pulse2 1.6s ease-in-out infinite}
+@keyframes pulse2{50%{opacity:.35;transform:scale(.7)}}
+.mark{font-size:clamp(2.6rem,min(15vw,17vh),9.5rem)}
+.markfix{padding-top:64px;padding-bottom:36vh}
+@media (max-height:640px){.hero .sub{display:none}}
+.logo,.tools button{white-space:nowrap}
+@media (max-width:480px){.logo{font-size:.92rem;letter-spacing:.08em}nav{padding:8px 12px}.tools{gap:6px}.tools button{padding:6px 10px;font-size:.78rem}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}}
 </style>
 </head>
@@ -177,6 +187,7 @@ footer{padding:18px 0}
 <h1 data-k="h1"></h1>
 <p class="sub" data-k="sub"></p>
 <a class="cta" href="#scripts" data-k="cta"></a>
+<div class="vis" id="vis" hidden><span class="dot"></span><b id="vn">0</b> <span id="vl"></span> · <b id="vu">0</b> <span id="vl2"></span></div>
 <div class="hint">SCROLL ↓</div>
 </section>
 
@@ -216,9 +227,9 @@ greet("Studio Shin")`}
 ]/*DATA_END*/;
 
 var T={
-zh:{h1:'<span>脚本</span>展示，<br>一键复制，直接使用。',sub:'向下滚动，挑选你需要的脚本，一键复制或下载。',cta:'查看脚本',h2:'脚本列表',copy:'复制代码',q:'搜索脚本…',cnt:'个脚本',none:'没有找到',ln:'行',dwn:'下载',done:'已复制 ✓',foot:'保留所有权利。',
+zh:{h1:'<span>脚本</span>展示，<br>一键复制，直接使用。',sub:'向下滚动，挑选你需要的脚本，一键复制或下载。',cta:'查看脚本',h2:'脚本列表',copy:'复制代码',q:'搜索脚本…',cnt:'个脚本',none:'没有找到',ln:'行',dwn:'下载',vv:'次访问',vu:'位访客',done:'已复制 ✓',foot:'保留所有权利。',
 f:[['01','一键复制','点击按钮即可复制完整代码。'],['02','随时查看','无需登录，打开网页就能看。'],['03','中英双语','支持中文与英文界面切换。']]},
-en:{h1:'<span>Scripts</span> on display,<br>copy and use instantly.',sub:'Scroll down, pick a script, then copy or download it in one click.',cta:'View scripts',h2:'Script library',copy:'Copy code',q:'Search scripts…',cnt:'scripts',none:'No matches',ln:'lines',dwn:'Download',done:'Copied ✓',foot:'All rights reserved.',
+en:{h1:'<span>Scripts</span> on display,<br>copy and use instantly.',sub:'Scroll down, pick a script, then copy or download it in one click.',cta:'View scripts',h2:'Script library',copy:'Copy code',q:'Search scripts…',cnt:'scripts',none:'No matches',ln:'lines',dwn:'Download',vv:'visits',vu:'visitors',done:'Copied ✓',foot:'All rights reserved.',
 f:[['01','One-click copy','Copy the full code with a single click.'],['02','Open to everyone','No login needed — just open and read.'],['03','Bilingual','Switch between Chinese and English.']]}
 };
 var lang="zh",cur=0,$=function(i){return document.getElementById(i)};
@@ -434,6 +445,24 @@ function boot(){
   Promise.all([claude.use("artifact"),claude.use("user")]).then(function(r){art=r[0];owner=!!(r[0]&&r[1]&&r[1].isOwner());if(owner)build()}).catch(function(){});
 }
 boot();
+})();
+
+/* ===== visitor counter ===== */
+(function(){
+  var vis=$("vis"),vn=$("vn"),vu=$("vu"),ST=null,done=false;
+  function fmt(n){return Number(n).toLocaleString(lang==="zh"?"zh-CN":"en-US")}
+  function labels(){$("vl").textContent=T[lang].vv;$("vl2").textContent=T[lang].vu}
+  function up(el,to){var t0=null;(function f(t){if(t0===null)t0=t;var k=Math.min(1,(t-t0)/1000);el.textContent=fmt(Math.round(to*(1-Math.pow(1-k,3))));if(k<1)requestAnimationFrame(f)})(performance.now())}
+  var _r4=render;render=function(){_r4();labels();if(ST&&done){vn.textContent=fmt(ST.views);vu.textContent=fmt(ST.unique)}};
+  labels();
+  var seen=false,h={"Content-Type":"application/json"};
+  try{seen=sessionStorage.getItem("vc")==="1";var tk=sessionStorage.getItem("tok");if(tk)h.Authorization="Bearer "+tk}catch(e){}
+  fetch(seen?"/api/stats":"/api/visit",{method:seen?"GET":"POST",headers:h})
+    .then(function(r){return r.ok?r.json():null})
+    .then(function(j){if(!j||typeof j.views!=="number")return;
+      try{sessionStorage.setItem("vc","1")}catch(e){}
+      ST=j;vis.hidden=false;up(vn,j.views);up(vu,j.unique);setTimeout(function(){done=true},1100)})
+    .catch(function(){});
 })();
 </script>
 </body>
