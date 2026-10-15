@@ -200,6 +200,12 @@ footer{padding:18px 0}
 .lk:hover{border-color:var(--acc);color:var(--acc);transform:translateY(-3px);box-shadow:0 6px 20px -6px var(--acc)}
 .pc{transform:translate(calc(var(--x)*var(--ep,0)*1px + var(--rx,0)*1px),calc(var(--y)*var(--ep,0)*1px + var(--f,0)*var(--sy,0)*.1px + var(--f,0)*var(--v,0)*1px + var(--ry,0)*1px)) rotate(calc(var(--r)*var(--ep,0)*1deg + var(--f,0)*var(--v,0)*.25deg)) scale(calc(1 + var(--ep,0)*.25));opacity:calc(1 - var(--ep,0)*.86)}
 @media (max-width:720px){.hgrid{grid-template-columns:1fr}.hlist{flex-direction:row;max-height:none;overflow-x:auto}.hlist .item{flex:0 0 150px}}
+/* ===== v5: NEW badge, backup ===== */
+@keyframes glowp{50%{box-shadow:0 0 18px var(--acc)}}
+.item b em.new{font-style:normal;font-family:"JetBrains Mono",monospace;font-size:.6rem;font-weight:700;letter-spacing:.1em;margin-left:7px;padding:2px 7px;border-radius:999px;background:linear-gradient(90deg,var(--acc),var(--acc2));color:#04110c;box-shadow:0 0 10px color-mix(in srgb,var(--acc) 60%,transparent);animation:glowp 2s ease-in-out infinite;vertical-align:middle}
+.upd{color:var(--acc);font-size:.8rem;white-space:nowrap}
+.row2[hidden]{display:none}
+#bkinfo{color:var(--text);font-size:.9rem}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}}
 </style>
 </head>
@@ -256,9 +262,9 @@ greet("Studio Shin")`}
 ]/*DATA_END*/;
 
 var T={
-zh:{h1:'<span>脚本</span>展示，<br>一键复制，直接使用。',sub:'向下滚动，挑选你需要的脚本，一键复制或下载。',cta:'查看脚本',h2:'脚本列表',copy:'复制代码',q:'搜索脚本…',cnt:'个脚本',none:'没有找到',ln:'行',dwn:'下载',vv:'次访问',vu:'位访客',lnk:'链接',lnkok:'链接已复制',hist:'历史',ht:'版本历史',curv:'当前',cpv:'复制此版本',rest:'恢复此版本',nodiff:'改动太大，这里不显示差异',same:'与上一版相同',done:'已复制 ✓',foot:'保留所有权利。',
+zh:{h1:'<span>脚本</span>展示，<br>一键复制，直接使用。',sub:'向下滚动，挑选你需要的脚本，一键复制或下载。',cta:'查看脚本',h2:'脚本列表',copy:'复制代码',q:'搜索脚本…',cnt:'个脚本',none:'没有找到',ln:'行',dwn:'下载',vv:'次访问',vu:'位访客',lnk:'链接',upd:'更新于',lnkok:'链接已复制',hist:'历史',ht:'版本历史',curv:'当前',cpv:'复制此版本',rest:'恢复此版本',nodiff:'改动太大，这里不显示差异',same:'与上一版相同',done:'已复制 ✓',foot:'保留所有权利。',
 f:[['01','一键复制','点击按钮即可复制完整代码。'],['02','随时查看','无需登录，打开网页就能看。'],['03','中英双语','支持中文与英文界面切换。']]},
-en:{h1:'<span>Scripts</span> on display,<br>copy and use instantly.',sub:'Scroll down, pick a script, then copy or download it in one click.',cta:'View scripts',h2:'Script library',copy:'Copy code',q:'Search scripts…',cnt:'scripts',none:'No matches',ln:'lines',dwn:'Download',vv:'visits',vu:'visitors',lnk:'Link',lnkok:'Link copied',hist:'History',ht:'Version history',curv:'current',cpv:'Copy this version',rest:'Restore this version',nodiff:'Too many changes to show a diff',same:'Same as the previous version',done:'Copied ✓',foot:'All rights reserved.',
+en:{h1:'<span>Scripts</span> on display,<br>copy and use instantly.',sub:'Scroll down, pick a script, then copy or download it in one click.',cta:'View scripts',h2:'Script library',copy:'Copy code',q:'Search scripts…',cnt:'scripts',none:'No matches',ln:'lines',dwn:'Download',vv:'visits',vu:'visitors',lnk:'Link',upd:'Updated',lnkok:'Link copied',hist:'History',ht:'Version history',curv:'current',cpv:'Copy this version',rest:'Restore this version',nodiff:'Too many changes to show a diff',same:'Same as the previous version',done:'Copied ✓',foot:'All rights reserved.',
 f:[['01','One-click copy','Copy the full code with a single click.'],['02','Open to everyone','No login needed — just open and read.'],['03','Bilingual','Switch between Chinese and English.']]}
 };
 var lang="zh",cur=0,$=function(i){return document.getElementById(i)};
@@ -269,6 +275,9 @@ var LN={lua:"Lua",py:"Python",js:"JavaScript",ts:"TypeScript",sh:"Shell",bat:"Ba
 function ext(n){var m=/\.([a-z0-9]+)$/i.exec(n||"");return m?m[1].toLowerCase():""}
 function nl(c){return String(c||"").replace(/\n$/,"").split("\n").length}
 function kb(n){return n<1024?n+" B":(n/1024).toFixed(1)+" KB"}
+function ago(t){if(!t)return"";try{var s=Math.max(0,(Date.now()-t)/1000),r=new Intl.RelativeTimeFormat(lang==="zh"?"zh-CN":"en",{numeric:"auto"});
+  if(s<60)return r.format(0,"second");if(s<3600)return r.format(-Math.floor(s/60),"minute");if(s<86400)return r.format(-Math.floor(s/3600),"hour");
+  var d=s/86400;if(d<30)return r.format(-Math.floor(d),"day");if(d<365)return r.format(-Math.floor(d/30),"month");return r.format(-Math.floor(d/365),"year")}catch(e){return""}}
 function drawList(){
   var l=$("tabs"),t=T[lang],q=qs.trim().toLowerCase(),n=0;
   l.innerHTML="";
@@ -278,8 +287,8 @@ function drawList(){
     var b=document.createElement("button");b.type="button";b.className="item"+(i===cur?" on":"");b.dataset.i=i;
     b.style.animationDelay=Math.min(n,12)*45+"ms";
     var no=document.createElement("i");no.textContent=String(i+1).padStart(2,"0");
-    var h=document.createElement("b");h.textContent=s.name;
-    var m=document.createElement("small");m.textContent=(LN[ext(s.name)]||ext(s.name).toUpperCase()||"TEXT")+" \u00b7 "+nl(s.code)+" "+t.ln+" \u00b7 "+kb(s.code.length);
+    var h=document.createElement("b");h.textContent=s.name;if(s.t&&Date.now()-s.t<6048e5){var nw=document.createElement("em");nw.className="new";nw.textContent="NEW";h.appendChild(nw)}
+    var m=document.createElement("small");m.textContent=(LN[ext(s.name)]||ext(s.name).toUpperCase()||"TEXT")+" \u00b7 "+nl(s.code)+" "+t.ln+" \u00b7 "+kb(s.code.length)+(s.t?" \u00b7 "+ago(s.t):"");
     var d=document.createElement("span");d.textContent=s[lang]||s.zh||s.en||"";
     b.appendChild(no);b.appendChild(h);b.appendChild(m);b.appendChild(d);
     b.onclick=function(){pick(i)};
@@ -315,7 +324,7 @@ function hl(code,e){
 function typeStop(){if(TY){cancelAnimationFrame(TY);TY=null}}
 function drawView(anim){
   var s=SCRIPTS[cur];if(!s)return;typeStop();
-  $("desc").textContent=s[lang]||s.zh||s.en||"";
+  var dd=$("desc");dd.textContent=s[lang]||s.zh||s.en||"";if(s.t){var u=document.createElement("span");u.className="upd";u.textContent=" \u00b7 "+T[lang].upd+" "+ago(s.t);dd.appendChild(u)}
   var c=nl(s.code),g=[];for(var k=1;k<=c;k++)g.push(k);$("gut").textContent=g.join("\n");
   var e=ext(s.name),code=$("code"),n=s.code.length;
   if(!anim||n>5000||matchMedia("(prefers-reduced-motion: reduce)").matches){code.innerHTML=hl(s.code,e);return}
@@ -447,31 +456,39 @@ render();
 
 /* ===== owner-only: add / delete scripts (saves by republishing this page) ===== */
 (function(){
-var L={zh:{add:"＋ 添加脚本",et:"编辑脚本",edit:"✎ 编辑",lkb:"联系方式",lkt:"联系方式（每行一个：名称 | 链接）",lkh:"例如：Discord | https://discord.gg/xxxx",nosrv:"需要连接服务器才能保存",dl:"⬇ 下载更新后的 index.html",out:"退出",lt:"管理员登录",lu:"账号",lp:"密码",lgb:"登录",bad:"账号或密码错误",del:"删除",sure:"确认删除？",t:"添加你的脚本",n:"文件名，例如 script.lua",dz:"中文说明（可选）",de:"English description (optional)",c:"把代码粘贴在这里，或把文件拖进来…",pick:"从电脑选择文件",save:"保存并发布",x:"取消",ing:"发布中…",need:"请填写文件名和代码",big:"文件太大（最大 400KB）",fail:"失败："},
-en:{add:"＋ Add script",et:"Edit script",edit:"✎ Edit",lkb:"Contact links",lkt:"Contact links (one per line: Name | URL)",lkh:"Example: Discord | https://discord.gg/xxxx",nosrv:"Needs a server connection to save",dl:"⬇ Download updated index.html",out:"Log out",lt:"Admin login",lu:"Username",lp:"Password",lgb:"Log in",bad:"Wrong username or password",del:"Delete",sure:"Sure?",t:"Add your script",n:"File name, e.g. script.lua",dz:"中文说明 (optional)",de:"English description (optional)",c:"Paste code here, or drop a file…",pick:"Choose file",save:"Save & publish",x:"Cancel",ing:"Publishing…",need:"Name and code are required",big:"File too large (max 400KB)",fail:"Failed: "}};
-var M1="/*DATA_"+"START*/",M2="/*DATA_"+"END*/",art,owner=false,built=false,tries=0,armed=false,editIdx=-1,TOK="";
+var L={zh:{add:"＋ 添加脚本",et:"编辑脚本",edit:"✎ 编辑",lkb:"联系方式",lkt:"联系方式（每行一个：名称 | 链接）",lkh:"例如：Discord | https://discord.gg/xxxx",nosrv:"需要连接服务器才能保存",bk:"备份",bkt:"备份和恢复",bkh:"导出会保存所有脚本、历史版本和联系方式。导入时可以「合并」（同名脚本会被覆盖），也可以「全部替换」（联系方式也会一起恢复）。",bke:"⬇ 导出备份",bkp:"⬆ 导入备份文件",bkinfo:"找到 {n} 个脚本、{l} 个联系方式。",bkskip:"（{b} 个无效的已跳过）",bkm1:"合并",bkm2:"全部替换",bksure:"再点一次确认",bkbad:"这不是有效的备份文件",bkmany:"脚本总数不能超过 100 个",big2:"文件太大",dl:"⬇ 下载更新后的 index.html",out:"退出",lt:"管理员登录",lu:"账号",lp:"密码",lgb:"登录",bad:"账号或密码错误",del:"删除",sure:"确认删除？",t:"添加你的脚本",n:"文件名，例如 script.lua",dz:"中文说明（可选）",de:"English description (optional)",c:"把代码粘贴在这里，或把文件拖进来…",pick:"从电脑选择文件",save:"保存并发布",x:"取消",ing:"发布中…",need:"请填写文件名和代码",big:"文件太大（最大 400KB）",fail:"失败："},
+en:{add:"＋ Add script",et:"Edit script",edit:"✎ Edit",lkb:"Contact links",lkt:"Contact links (one per line: Name | URL)",lkh:"Example: Discord | https://discord.gg/xxxx",nosrv:"Needs a server connection to save",bk:"Backup",bkt:"Backup & restore",bkh:"Export saves all scripts, version history and contact links. When importing you can Merge (same-name scripts are overwritten) or Replace everything (contact links are restored too).",bke:"⬇ Export backup",bkp:"⬆ Import backup file",bkinfo:"Found {n} scripts and {l} contact links.",bkskip:" ({b} invalid skipped)",bkm1:"Merge",bkm2:"Replace all",bksure:"Click again to confirm",bkbad:"Not a valid backup file",bkmany:"Max 100 scripts in total",big2:"File too large",dl:"⬇ Download updated index.html",out:"Log out",lt:"Admin login",lu:"Username",lp:"Password",lgb:"Log in",bad:"Wrong username or password",del:"Delete",sure:"Sure?",t:"Add your script",n:"File name, e.g. script.lua",dz:"中文说明 (optional)",de:"English description (optional)",c:"Paste code here, or drop a file…",pick:"Choose file",save:"Save & publish",x:"Cancel",ing:"Publishing…",need:"Name and code are required",big:"File too large (max 400KB)",fail:"Failed: "}};
+var M1="/*DATA_"+"START*/",M2="/*DATA_"+"END*/",art,owner=false,built=false,tries=0,armed=false,editIdx=-1,bkarm=false,BK=null,TOK="";
 try{TOK=sessionStorage.getItem("tok")||""}catch(e){}
 var g=function(i){return document.getElementById(i)};
+function MS(){var b=g("bkm");return b&&b.classList.contains("on")?g("bks"):g("ms")}
+function cleanS(s){if(!s||typeof s!=="object")return null;
+  if(["name","zh","en","code"].some(function(k){return typeof s[k]!=="string"}))return null;
+  if(!s.name||s.name.length>80||s.zh.length>500||s.en.length>500||s.code.length>400000)return null;
+  var o={name:s.name,zh:s.zh,en:s.en,code:s.code};
+  if(Number.isInteger(s.t))o.t=s.t;
+  if(Array.isArray(s.hist)){var h=[];s.hist.slice(0,5).forEach(function(x){if(x&&typeof x.code==="string"&&x.code.length<=400000&&Number.isInteger(x.t))h.push({t:x.t,code:x.code})});if(h.length)o.hist=h}
+  return o}
 function commit(arr){
-  if(TOK){g("ms").textContent=L[lang].ing;g("mv").disabled=true;
+  if(TOK){MS().textContent=L[lang].ing;g("mv").disabled=true;
     fetch("/api/scripts",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+TOK},body:JSON.stringify(arr)})
     .then(function(r){return r.json().catch(function(){return{}}).then(function(j){if(!r.ok)throw j;return j})})
-    .then(function(){SCRIPTS=arr;if(cur>=arr.length)cur=arr.length-1;["mn","mz","me","mc"].forEach(function(k){g(k).value=""});g("ms").textContent="";g("mv").disabled=false;g("mdl").classList.remove("on");render()})
-    .catch(function(e){g("mv").disabled=false;g("ms").textContent=L[lang].fail+((e&&e.error)||"");if(e&&e.error==="auth"){TOK="";try{sessionStorage.clear()}catch(x){}}});
+    .then(function(){SCRIPTS=arr;if(cur>=arr.length)cur=arr.length-1;["mn","mz","me","mc"].forEach(function(k){g(k).value=""});MS().textContent="";g("mv").disabled=false;g("mdl").classList.remove("on");g("bkm").classList.remove("on");render()})
+    .catch(function(e){g("mv").disabled=false;MS().textContent=L[lang].fail+((e&&e.error)||"");if(e&&e.error==="auth"){TOK="";try{sessionStorage.clear()}catch(x){}}});
     return}
   var i=PRISTINE.indexOf(M1),j=PRISTINE.indexOf(M2);
-  if(i<0||j<0){g("ms").textContent=L[lang].fail+"template";return}
+  if(i<0||j<0){MS().textContent=L[lang].fail+"template";return}
   var json=JSON.stringify(arr,null,1).replace(/</g,"\\u003c").replace(/\u2028/g,"\\u2028").replace(/\u2029/g,"\\u2029");
   var html=PRISTINE.slice(0,i+M1.length)+json+PRISTINE.slice(j);
-  if(art&&owner){g("ms").textContent=L[lang].ing;g("mv").disabled=true;
-    art.publish(html).catch(function(e){g("ms").textContent=L[lang].fail+((e&&(e.code||e.message))||"");g("mv").disabled=false;g("mdl").classList.add("on")});return}
+  if(art&&owner){MS().textContent=L[lang].ing;g("mv").disabled=true;
+    art.publish(html).catch(function(e){MS().textContent=L[lang].fail+((e&&(e.code||e.message))||"");g("mv").disabled=false;g("mdl").classList.add("on")});return}
   SCRIPTS=arr;if(cur>=arr.length)cur=arr.length-1;PRISTINE=html;
-  ["mn","mz","me","mc"].forEach(function(k){g(k).value=""});g("ms").textContent="";g("mdl").classList.remove("on");
+  ["mn","mz","me","mc"].forEach(function(k){g(k).value=""});MS().textContent="";g("mdl").classList.remove("on");g("bkm").classList.remove("on");
   g("dlb").style.display="";render();
 }
 function applyL(){var l=L[lang];
   g("addb").textContent=l.add;g("delb").textContent=armed?l.sure:l.del;g("delb").style.display=SCRIPTS.length>1?"":"none";
-  g("mt").textContent=editIdx>=0?l.et:l.t;g("editb").textContent=l.edit;g("lkb").textContent=l.lkb;g("lkt").textContent=l.lkt;g("lkh").textContent=l.lkh;g("lkc").textContent=l.x;g("lkv").textContent=l.save;g("mn").placeholder=l.n;g("mz").placeholder=l.dz;g("me").placeholder=l.de;g("mc").placeholder=l.c;
+  g("mt").textContent=editIdx>=0?l.et:l.t;g("editb").textContent=l.edit;g("lkb").textContent=l.lkb;g("lkt").textContent=l.lkt;g("lkh").textContent=l.lkh;g("lkc").textContent=l.x;g("lkv").textContent=l.save;g("bkb").textContent=l.bk;g("bkt").textContent=l.bkt;g("bkh").textContent=l.bkh;g("bke").textContent=l.bke;g("bkp").textContent=l.bkp;g("bkx").textContent=l.x;g("bkm1").textContent=l.bkm1;g("bkm2").textContent=bkarm?l.bksure:l.bkm2;g("mn").placeholder=l.n;g("mz").placeholder=l.dz;g("me").placeholder=l.de;g("mc").placeholder=l.c;
   g("mp").textContent=l.pick;g("mv").textContent=l.save;g("mx").textContent=l.x;g("dlb").textContent=l.dl;g("lob").textContent=l.out;var z=lang==="zh";g("md").textContent=TOK?(z?"● 已连接服务器":"● Server connected"):(art&&owner?(z?"● claude.ai 发布模式":"● claude.ai publish"):(z?"○ 仅本地模式（刷新会丢失）":"○ Local only (lost on refresh)"));g("md").style.color=(TOK||(art&&owner))?"var(--acc)":"#ff5d6c"}
 function loadFile(f){if(f.size>409600){g("ms").textContent=L[lang].big;return}
   f.text().then(function(t){g("mc").value=t;if(!g("mn").value)g("mn").value=f.name;g("ms").textContent=""})}
@@ -481,7 +498,7 @@ function build(){
   m.innerHTML='<div class="card"><h3 id="mt"></h3><input id="mn" maxlength="80"><input id="mz" maxlength="200"><input id="me" maxlength="200"><textarea id="mc" spellcheck="false"></textarea><div class="row2"><label class="ghost"><input type="file" id="mf" hidden><span id="mp"></span></label><span id="ms"></span><span class="sp"></span><button class="ghost" id="mx"></button><button class="copy" id="mv"></button></div></div>';
   document.body.appendChild(m);
   var a=document.createElement("div");a.className="adm";
-  a.innerHTML='<button class="ghost" id="addb"></button><button class="ghost" id="editb"></button><button class="ghost danger" id="delb"></button><button class="ghost" id="lkb"></button><button class="ghost" id="dlb" style="display:none"></button><button class="ghost" id="lob"></button><span id="md" style="font-size:.8rem;align-self:center"></span>';
+  a.innerHTML='<button class="ghost" id="addb"></button><button class="ghost" id="editb"></button><button class="ghost danger" id="delb"></button><button class="ghost" id="bkb"></button><button class="ghost" id="lkb"></button><button class="ghost" id="dlb" style="display:none"></button><button class="ghost" id="lob"></button><span id="md" style="font-size:.8rem;align-self:center"></span>';
   var meta=document.querySelector(".meta");meta.insertBefore(a,g("dwn"));
   g("addb").onclick=function(){editIdx=-1;["mn","mz","me","mc"].forEach(function(k){g(k).value=""});applyL();g("mdl").classList.add("on")};
   g("editb").onclick=function(){var o=SCRIPTS[cur];if(!o)return;editIdx=cur;g("mn").value=o.name;g("mz").value=o.zh||"";g("me").value=o.en||"";g("mc").value=o.code;applyL();g("mdl").classList.add("on")};
@@ -504,6 +521,34 @@ function build(){
   var k=document.createElement("div");k.className="mdl";k.id="lkm";
   k.innerHTML='<div class="card"><h3 id="lkt"></h3><p id="lkh" style="margin:0;color:var(--mute);font-size:.85rem"></p><textarea id="lkx" spellcheck="false" style="min-height:150px"></textarea><div class="row2"><span id="lks"></span><span class="sp"></span><button class="ghost" id="lkc"></button><button class="copy" id="lkv"></button></div></div>';
   document.body.appendChild(k);
+  var bm=document.createElement("div");bm.className="mdl";bm.id="bkm";
+  bm.innerHTML='<div class="card"><h3 id="bkt"></h3><p id="bkh" style="margin:0;color:var(--mute);font-size:.85rem"></p><div class="row2"><button class="copy" id="bke"></button><label class="ghost"><input type="file" id="bkf" accept=".json,application/json" hidden><span id="bkp"></span></label></div><div id="bkinfo"></div><div class="row2" id="bkact" hidden><button class="ghost" id="bkm1"></button><button class="ghost danger" id="bkm2"></button></div><div class="row2"><span id="bks"></span><span class="sp"></span><button class="ghost" id="bkx"></button></div></div>';
+  document.body.appendChild(bm);
+  function bkReset(){BK=null;bkarm=false;g("bkinfo").textContent="";g("bks").textContent="";g("bkact").hidden=true}
+  g("bkb").onclick=function(){bkReset();applyL();bm.classList.add("on")};
+  g("bkx").onclick=function(){bm.classList.remove("on")};bm.onclick=function(e){if(e.target===bm)bm.classList.remove("on")};
+  g("bke").onclick=function(){var d={app:"studio-shin",version:1,exported:new Date().toISOString(),scripts:SCRIPTS,site:SITE};
+    var bl=new Blob([JSON.stringify(d,null,1)],{type:"application/json"}),a=document.createElement("a"),u=URL.createObjectURL(bl);
+    a.href=u;a.download="studio-shin-backup-"+new Date().toISOString().slice(0,10)+".json";document.body.appendChild(a);a.click();a.remove();
+    setTimeout(function(){URL.revokeObjectURL(u)},2000);g("bks").textContent="\u2713"};
+  g("bkf").onchange=function(){var f=g("bkf").files[0];g("bkf").value="";if(!f)return;bkReset();
+    if(f.size>8*1024*1024){g("bks").textContent=L[lang].big2;return}
+    f.text().then(function(t){var j;try{j=JSON.parse(t)}catch(e){g("bks").textContent=L[lang].bkbad;return}
+      var raw=Array.isArray(j)?j:(j&&Array.isArray(j.scripts)?j.scripts:null);if(!raw){g("bks").textContent=L[lang].bkbad;return}
+      var ok=[],bad=0;raw.forEach(function(s){var c=cleanS(s);if(c)ok.push(c);else bad++});
+      if(!ok.length){g("bks").textContent=L[lang].bkbad;return}
+      var links=[];if(j&&j.site&&Array.isArray(j.site.links))j.site.links.forEach(function(l){if(l&&typeof l.label==="string"&&typeof l.url==="string"&&l.label.trim()&&l.label.length<=30&&l.url.length<=300&&/^(https?:\/\/|mailto:)/i.test(l.url))links.push({label:l.label.trim(),url:l.url})});
+      BK={scripts:ok,links:links.slice(0,10)};
+      g("bkinfo").textContent=L[lang].bkinfo.replace("{n}",ok.length).replace("{l}",BK.links.length)+(bad?L[lang].bkskip.replace("{b}",bad):"");
+      g("bkact").hidden=false})};
+  g("bkm1").onclick=function(){if(!BK)return;var arr=SCRIPTS.slice();
+    BK.scripts.forEach(function(s){var i=-1;for(var k2=0;k2<arr.length;k2++)if(arr[k2].name===s.name){i=k2;break}if(i>=0)arr[i]=s;else arr.push(s)});
+    if(arr.length>100){g("bks").textContent=L[lang].bkmany;return}commit(arr)};
+  g("bkm2").onclick=function(){if(!BK)return;
+    if(!bkarm){bkarm=true;applyL();setTimeout(function(){bkarm=false;applyL()},3000);return}
+    bkarm=false;applyL();var ls=BK.links;commit(BK.scripts.slice(0,100));
+    if(TOK)fetch("/api/site",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+TOK},body:JSON.stringify({links:ls})}).then(function(r){if(r.ok){SITE={links:ls};drawLinks()}}).catch(function(){})};
+
   g("lkb").onclick=function(){g("lkx").value=(SITE.links||[]).map(function(l){return l.label+" | "+l.url}).join("\n");g("lks").textContent="";k.classList.add("on")};
   g("lkc").onclick=function(){k.classList.remove("on")};k.onclick=function(e){if(e.target===k)k.classList.remove("on")};
   g("lkv").onclick=function(){if(!TOK){g("lks").textContent=L[lang].nosrv;return}
