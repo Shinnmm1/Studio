@@ -62,11 +62,25 @@ def load_scripts():
         return None
 
 
+def fit_size(items, limit):
+    """Drop the oldest saved versions until everything fits in `limit` bytes."""
+    def size():
+        return len(json.dumps(items, ensure_ascii=False).encode("utf-8"))
+    while size() > limit:
+        with_hist = [x for x in items if x.get("hist")]
+        if not with_hist:
+            raise ValueError("too big (max about 900KB in total)")
+        w = max(with_hist, key=lambda x: len(x["hist"]))
+        w["hist"].pop()
+        if not w["hist"]:
+            del w["hist"]
+
+
 def store_scripts(items):
+    if USE_REDIS:
+        fit_size(items, MAX_REDIS_BYTES)
     text = json.dumps(items, ensure_ascii=False)
     if USE_REDIS:
-        if len(text.encode("utf-8")) > MAX_REDIS_BYTES:
-            raise ValueError("too big (max about 900KB in total)")
         rcmd("SET", KEY, text)
         return
     os.makedirs(DATA, exist_ok=True)
@@ -151,6 +165,56 @@ def bump(vid):
     return d["views"], len(d["seen"])
 
 
+# ---------- site settings (contact links) ----------
+SKEY = "studio-shin:site"
+SFILE = os.path.join(DATA, "site.json")
+LINK_OK = ("http://", "https://", "mailto:")
+
+
+def load_site():
+    if USE_REDIS:
+        raw = rcmd("GET", SKEY)
+        return json.loads(raw) if raw else {"links": []}
+    try:
+        with open(SFILE, encoding="utf-8") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return {"links": []}
+
+
+def store_site(d):
+    text = json.dumps(d, ensure_ascii=False)
+    if USE_REDIS:
+        rcmd("SET", SKEY, text)
+        return
+    os.makedirs(DATA, exist_ok=True)
+    tmp = SFILE + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        f.write(text)
+    os.replace(tmp, SFILE)
+
+
+def clean_script(s):
+    if not isinstance(s, dict) or not all(isinstance(s.get(k), str) for k in ("name", "zh", "en", "code")):
+        return None
+    if len(s["name"]) > 80 or len(s["zh"]) > 500 or len(s["en"]) > 500 or len(s["code"]) > 400_000:
+        return None
+    out = {k: s[k] for k in ("name", "zh", "en", "code")}
+    t = s.get("t")
+    if isinstance(t, int) and not isinstance(t, bool):
+        out["t"] = t
+    h = s.get("hist")
+    if isinstance(h, list):
+        hh = []
+        for x in h[:5]:
+            if (isinstance(x, dict) and isinstance(x.get("code"), str) and len(x["code"]) <= 400_000
+                    and isinstance(x.get("t"), int) and not isinstance(x.get("t"), bool)):
+                hh.append({"t": x["t"], "code": x["code"]})
+        if hh:
+            out["hist"] = hh
+    return out
+
+
 def token():
     return hmac.new(SECRET.encode(), b"admin-v1", hashlib.sha256).hexdigest()
 
@@ -202,11 +266,10 @@ def save_scripts():
         return jsonify(error="invalid"), 400
     clean = []
     for s in d:
-        if not isinstance(s, dict) or not all(isinstance(s.get(k), str) for k in ("name", "zh", "en", "code")):
-            return jsonify(error="invalid"), 400
-        if len(s["name"]) > 80 or len(s["code"]) > 400_000:
-            return jsonify(error="too big"), 400
-        clean.append({k: s[k] for k in ("name", "zh", "en", "code")})
+        c = clean_script(s)
+        if c is None:
+            return jsonify(error="invalid or too big"), 400
+        clean.append(c)
     try:
         store_scripts(clean)
     except ValueError as e:
@@ -233,6 +296,36 @@ def stats():
     except Exception:
         return jsonify(error="stats"), 502
     return jsonify(views=v, unique=u)
+
+
+@app.get("/api/site")
+def get_site():
+    try:
+        return jsonify(load_site())
+    except Exception:
+        return jsonify({"links": []})
+
+
+@app.post("/api/site")
+def save_site():
+    if not authed():
+        return jsonify(error="auth"), 401
+    d = request.get_json(silent=True) or {}
+    links = d.get("links")
+    if not isinstance(links, list) or len(links) > 10:
+        return jsonify(error="invalid"), 400
+    clean = []
+    for l in links:
+        if (not isinstance(l, dict) or not isinstance(l.get("label"), str) or not isinstance(l.get("url"), str)
+                or not l["label"].strip() or len(l["label"]) > 30 or len(l["url"]) > 300
+                or not l["url"].lower().startswith(LINK_OK)):
+            return jsonify(error="invalid link"), 400
+        clean.append({"label": l["label"].strip(), "url": l["url"].strip()})
+    try:
+        store_site({"links": clean})
+    except Exception as e:
+        return jsonify(error="storage: %s" % e), 500
+    return jsonify(ok=True)
 
 
 @app.get("/api/health")
