@@ -222,6 +222,8 @@ def clean_script(s):
             out["tags"] = seen[:5]
     if s.get("pin") is True:
         out["pin"] = True
+    if isinstance(s.get("doc"), str) and len(s["doc"]) <= 4000:
+        out["doc"] = s["doc"]
     h = s.get("hist")
     if isinstance(h, list):
         hh = []
