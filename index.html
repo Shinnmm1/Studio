@@ -235,6 +235,35 @@ footer{padding:18px 0}
 .pn{font-size:.85em}
 .pinl{display:flex;align-items:center;gap:8px;color:var(--text);font-size:.9rem;cursor:pointer}
 .mdl input[type=checkbox]{width:auto;padding:0;accent-color:var(--acc)}
+/* ===== v7: eco mode, guide, ad ===== */
+#eco[aria-pressed="true"]{border-color:var(--acc);color:var(--acc);box-shadow:0 0 12px color-mix(in srgb,var(--acc) 40%,transparent)}
+.eco #bg{display:none}
+.eco .ch{filter:none}
+.eco nav.glass,.eco .vis,.eco .mdl,.eco .adv{backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+.eco .cta::after,.eco .vis .dot,.eco .box,.eco h1,.eco h1 span,.eco .logo i,.eco .hint,.eco .item,.eco .item b em.new,.eco .tag::after,.eco .cur,.eco .adc,.eco .pb{animation:none!important}
+.eco .rv{transition-duration:.2s}
+.guide{flex:1;min-height:0;overflow:auto;padding:18px 22px;background:var(--code);border-top:1px solid var(--line);font-size:.93rem;line-height:1.7}
+.guide[hidden],.codewrap[hidden]{display:none}
+.guide h4{margin:1em 0 .3em;color:var(--acc);font-size:1rem}.guide h4:first-child{margin-top:0}
+.guide p{margin:.5em 0}.guide ul,.guide ol{margin:.4em 0;padding-left:1.4em}
+.guide code{background:color-mix(in srgb,var(--acc) 10%,transparent);padding:1px 6px;border-radius:5px;font-family:"JetBrains Mono",monospace;font-size:.85em;color:var(--tf)}
+.guide a{color:var(--acc2)}
+.ghost.gacc{border-color:color-mix(in srgb,var(--acc) 55%,transparent);color:var(--acc)}
+@keyframes popin{from{opacity:0;transform:translateY(24px) scale(.92)}to{opacity:1;transform:none}}
+.adv{position:fixed;inset:0;z-index:90;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(0,0,0,.62);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.adv[hidden]{display:none}
+.adc{width:min(440px,100%);text-align:center;border:1px solid transparent;border-radius:20px;padding:24px 24px 22px;display:grid;justify-items:center;gap:12px;background:linear-gradient(var(--panel),var(--panel)) padding-box,conic-gradient(from var(--a),transparent 55%,var(--acc),var(--acc2),transparent) border-box;box-shadow:0 0 70px color-mix(in srgb,var(--acc) 28%,transparent);animation:spin 5s linear infinite,popin .5s cubic-bezier(.2,.8,.2,1) both}
+.adtag{font:700 .68rem "JetBrains Mono",monospace;letter-spacing:.2em;padding:3px 12px;border:1px solid var(--line);border-radius:999px;color:var(--mute)}
+.adring{position:relative;width:58px;height:58px}
+.adring svg{width:100%;height:100%}
+.adring .rb{fill:none;stroke:var(--line);stroke-width:3}
+.adring .rf{fill:none;stroke:var(--acc);stroke-width:3;stroke-linecap:round;stroke-dasharray:119.4;stroke-dashoffset:0;transform:rotate(-90deg);transform-origin:center;transition:stroke-dashoffset 1s linear}
+.adring b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:700 1.1rem "JetBrains Mono",monospace;color:var(--text)}
+.adc h3{margin:0;font-size:1.2rem;line-height:1.35}
+.adc p{margin:0;color:var(--mute);font-size:.95rem}
+.addc{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center}
+.addc code{font:700 1rem "JetBrains Mono",monospace;color:var(--acc);background:var(--code);border:1px solid var(--line);border-radius:10px;padding:7px 14px}
+.adc .copy:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}}
 </style>
 </head>
@@ -243,7 +272,7 @@ footer{padding:18px 0}
 <div class="markfix"><div class="mark" id="mark" aria-label="Studio Shin"></div></div>
 <div class="wrap">
 <nav><div class="logo">STUDIO <i>SHIN</i></div>
-<div class="tools"><button id="lgn"></button><button id="lang">EN</button><button id="theme">◐</button></div></nav>
+<div class="tools"><button id="lgn"></button><button id="lang">EN</button><button id="eco" aria-pressed="false">⚡</button><button id="theme">◐</button></div></nav>
 
 <section class="hero">
 <div class="tag">// SCRIPT LIBRARY</div>
@@ -259,8 +288,8 @@ footer{padding:18px 0}
 <div class="box">
 <div class="lib">
 <aside class="side"><div class="srch"><input id="q" type="search" autocomplete="off"><div class="cnt" id="cnt"></div></div><div class="tagbar" id="tagbar" hidden></div><div class="list" id="tabs"></div></aside>
-<div class="view"><div class="meta"><p id="desc"></p><button class="ghost" id="lnk"></button><button class="ghost" id="hbtn" hidden></button><button class="ghost" id="dwn"></button><button class="copy" id="copy"></button></div>
-<div class="codewrap"><pre class="gut" id="gut" aria-hidden="true"></pre><pre class="code" id="code"></pre></div></div>
+<div class="view"><div class="meta"><p id="desc"></p><button class="ghost gacc" id="gbtn" hidden></button><button class="ghost" id="lnk"></button><button class="ghost" id="hbtn" hidden></button><button class="ghost" id="dwn"></button><button class="copy" id="copy"></button></div>
+<div class="codewrap" id="cwrap"><pre class="gut" id="gut" aria-hidden="true"></pre><pre class="code" id="code"></pre></div><div class="guide" id="guide" hidden></div></div>
 </div>
 </div>
 </section>
@@ -270,6 +299,7 @@ footer{padding:18px 0}
 </div>
 
 <div class="mdl" id="hmod"><div class="card wide"><h3 id="httl"></h3><div class="hgrid"><div class="hlist" id="hlist"></div><div class="hview"><div class="row2" id="hbar"></div><pre class="diff" id="hdiff"></pre></div></div><div class="row2"><span class="sp"></span><button class="ghost" id="hclose">×</button></div></div></div>
+<div class="adv" id="adv" role="dialog" aria-modal="true" aria-labelledby="adt" hidden><div class="adc"><span class="adtag" id="adtag"></span><div class="adring"><svg viewBox="0 0 44 44" aria-hidden="true"><circle class="rb" cx="22" cy="22" r="19"/><circle class="rf" id="adr" cx="22" cy="22" r="19"/></svg><b id="adn">8</b></div><h3 id="adt"></h3><p id="adp"></p><div class="addc"><code id="addis"></code><button class="ghost" id="adcp"></button></div><button class="copy" id="adx" disabled></button></div></div>
 <script>
 var PRISTINE="<!DOCTYPE html>\n"+document.documentElement.outerHTML;
 /* ====== 在这里放你的脚本 / PUT YOUR SCRIPTS HERE ======
@@ -291,9 +321,9 @@ greet("Studio Shin")`}
 ]/*DATA_END*/;
 
 var T={
-zh:{h1:'<span>脚本</span>展示，<br>一键复制，直接使用。',sub:'向下滚动，挑选你需要的脚本，一键复制或下载。',cta:'查看脚本',h2:'脚本列表',copy:'复制代码',q:'搜索脚本…',cnt:'个脚本',none:'没有找到',ln:'行',dwn:'下载',vv:'次访问',vu:'位访客',lnk:'链接',upd:'更新于',all:'全部',lnkok:'链接已复制',hist:'历史',ht:'版本历史',curv:'当前',cpv:'复制此版本',rest:'恢复此版本',nodiff:'改动太大，这里不显示差异',same:'与上一版相同',done:'已复制 ✓',foot:'保留所有权利。',
+zh:{h1:'<span>脚本</span>展示，<br>一键复制，直接使用。',sub:'向下滚动，挑选你需要的脚本，一键复制或下载。',cta:'查看脚本',h2:'脚本列表',copy:'复制代码',q:'搜索脚本…',cnt:'个脚本',none:'没有找到',ln:'行',dwn:'下载',vv:'次访问',vu:'位访客',lnk:'链接',upd:'更新于',all:'全部',guide:'使用说明',code:'代码',lnkok:'链接已复制',hist:'历史',ht:'版本历史',curv:'当前',cpv:'复制此版本',rest:'恢复此版本',nodiff:'改动太大，这里不显示差异',same:'与上一版相同',done:'已复制 ✓',foot:'保留所有权利。',
 f:[['01','一键复制','点击按钮即可复制完整代码。'],['02','随时查看','无需登录，打开网页就能看。'],['03','中英双语','支持中文与英文界面切换。']]},
-en:{h1:'<span>Scripts</span> on display,<br>copy and use instantly.',sub:'Scroll down, pick a script, then copy or download it in one click.',cta:'View scripts',h2:'Script library',copy:'Copy code',q:'Search scripts…',cnt:'scripts',none:'No matches',ln:'lines',dwn:'Download',vv:'visits',vu:'visitors',lnk:'Link',upd:'Updated',all:'All',lnkok:'Link copied',hist:'History',ht:'Version history',curv:'current',cpv:'Copy this version',rest:'Restore this version',nodiff:'Too many changes to show a diff',same:'Same as the previous version',done:'Copied ✓',foot:'All rights reserved.',
+en:{h1:'<span>Scripts</span> on display,<br>copy and use instantly.',sub:'Scroll down, pick a script, then copy or download it in one click.',cta:'View scripts',h2:'Script library',copy:'Copy code',q:'Search scripts…',cnt:'scripts',none:'No matches',ln:'lines',dwn:'Download',vv:'visits',vu:'visitors',lnk:'Link',upd:'Updated',all:'All',guide:'Guide',code:'Code',lnkok:'Link copied',hist:'History',ht:'Version history',curv:'current',cpv:'Copy this version',rest:'Restore this version',nodiff:'Too many changes to show a diff',same:'Same as the previous version',done:'Copied ✓',foot:'All rights reserved.',
 f:[['01','One-click copy','Copy the full code with a single click.'],['02','Open to everyone','No login needed — just open and read.'],['03','Bilingual','Switch between Chinese and English.']]}
 };
 var lang="zh",cur=0,$=function(i){return document.getElementById(i)};
@@ -361,13 +391,36 @@ function hl(code,e){
     var c=m[1]!==undefined?"c":m[2]!==undefined?"s":m[3]!==undefined?"n":m[4]!==undefined?"k":"f";
     out+='<i class="t'+c+'">'+esc(m[0])+'</i>';last=re.lastIndex}
   return out+esc(code.slice(last))}
+var GV=false;
+function md(src){
+  var out=[],list=null,para=[];
+  function inl(x){x=esc(x).replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+    x=x.replace(/`([^`]+)`/g,"<code>$1</code>").replace(/\*\*([^*]+)\*\*/g,"<b>$1</b>");
+    return x.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,function(m0,t,u){return /&(quot|#39|lt|gt);/.test(u)?m0:'<a href="'+u+'" target="_blank" rel="noopener noreferrer">'+t+'</a>'})}
+  function fp(){if(para.length){out.push("<p>"+inl(para.join(" "))+"</p>");para=[]}}
+  function fl(){if(list){out.push("<"+list.t+">"+list.i.map(function(x){return"<li>"+inl(x)+"</li>"}).join("")+"</"+list.t+">");list=null}}
+  String(src).replace(/\r/g,"").split("\n").forEach(function(ln){var m;
+    if(!ln.trim()){fp();fl();return}
+    if((m=/^#{1,3}\s+(.*)$/.exec(ln))){fp();fl();out.push("<h4>"+inl(m[1])+"</h4>");return}
+    if((m=/^\s*[-*]\s+(.*)$/.exec(ln))){fp();if(!list||list.t!=="ul"){fl();list={t:"ul",i:[]}}list.i.push(m[1]);return}
+    if((m=/^\s*\d+[.)]\s+(.*)$/.exec(ln))){fp();if(!list||list.t!=="ol"){fl();list={t:"ol",i:[]}}list.i.push(m[1]);return}
+    fl();para.push(ln.trim())});
+  fp();fl();return out.join("")}
+function showGuide(on){GV=on;$("cwrap").hidden=on;$("guide").hidden=!on;var t=T[lang];$("gbtn").textContent=on?"\uD83D\uDCBB "+t.code:"\uD83D\uDCD6 "+t.guide}
+function ECOON(){return document.documentElement.classList.contains("eco")}
+function setEco(on,save){document.documentElement.classList.toggle("eco",on);
+  var b=$("eco");if(b)b.setAttribute("aria-pressed",on?"true":"false");
+  if(save){try{localStorage.setItem("eco",on?"1":"0")}catch(e){}}
+  document.querySelectorAll("#mark .ch").forEach(function(c){c.style.setProperty("--rx","0");c.style.setProperty("--ry","0")});
+  if(!on&&window.bgLoop&&!window.BGR){window.BGR=true;window.bgLoop()}}
 function typeStop(){if(TY){cancelAnimationFrame(TY);TY=null}}
 function drawView(anim){
   var s=SCRIPTS[cur];if(!s)return;typeStop();
   var dd=$("desc");dd.textContent=s[lang]||s.zh||s.en||"";if(s.t){var u=document.createElement("span");u.className="upd";u.textContent=" \u00b7 "+T[lang].upd+" "+ago(s.t);dd.appendChild(u)}
   var c=nl(s.code),g=[];for(var k=1;k<=c;k++)g.push(k);$("gut").textContent=g.join("\n");
   var e=ext(s.name),code=$("code"),n=s.code.length;
-  if(!anim||n>5000||matchMedia("(prefers-reduced-motion: reduce)").matches){code.innerHTML=hl(s.code,e);return}
+  $("gbtn").hidden=!s.doc;if(s.doc)$("guide").innerHTML=md(s.doc);showGuide(GV&&!!s.doc);
+  if(!anim||n>5000||ECOON()||matchMedia("(prefers-reduced-motion: reduce)").matches){code.innerHTML=hl(s.code,e);return}
   var t0=performance.now();
   (function f(){var i=Math.min(n,Math.ceil(n*(performance.now()-t0)/900));
     code.innerHTML=hl(s.code.slice(0,i),e)+(i<n?'<span class="cur"></span>':"");
@@ -382,14 +435,14 @@ function copyText(t){function fb(){var a=document.createElement("textarea");a.va
   if(navigator.clipboard&&navigator.clipboard.writeText)return navigator.clipboard.writeText(t).catch(fb);fb()}
 function hashName(){var m=/^#s=(.+)$/.exec(location.hash);if(!m)return null;try{return decodeURIComponent(m[1])}catch(e){return null}}
 function applyHash(sc){var n=hashName();if(n===null)return false;
-  for(var i=0;i<SCRIPTS.length;i++)if(SCRIPTS[i].name===n){cur=i;userSel=true;render();
+  for(var i=0;i<SCRIPTS.length;i++)if(SCRIPTS[i].name===n){cur=i;GV=false;userSel=true;render();
     if(sc)setTimeout(function(){$("scripts").scrollIntoView({behavior:"smooth"})},350);return true}return false}
 function setHash(){try{history.replaceState(null,"","#s="+encodeURIComponent(SCRIPTS[cur].name))}catch(e){}}
 function drawLinks(){var c=$("links");c.innerHTML="";var ok=0;
   (SITE.links||[]).forEach(function(l){if(!l||!/^(https?:\/\/|mailto:)/i.test(l.url||""))return;
     var a=document.createElement("a");a.className="lk";a.href=l.url;a.target="_blank";a.rel="noopener noreferrer";a.textContent=l.label;c.appendChild(a);ok++});
   c.hidden=!ok}
-function pick(i){cur=i;userSel=true;setHash();pulseMark();render()}
+function pick(i){cur=i;GV=false;userSel=true;setHash();pulseMark();render()}
 function keep(){var l=$("tabs"),o=l.querySelector(".on");if(!o)return;
   if(getComputedStyle(l).flexDirection==="row"){l.scrollLeft=o.offsetLeft-l.clientWidth/2+o.offsetWidth/2}
   else if(o.offsetTop<l.scrollTop+8){l.scrollTop=o.offsetTop-10}
@@ -398,7 +451,7 @@ function render(){
   var t=T[lang];document.documentElement.lang=lang==="zh"?"zh-CN":"en";
   document.querySelectorAll("[data-k]").forEach(function(e){var v=t[e.dataset.k];if(e.dataset.k==="h1")e.innerHTML=v;else e.textContent=v});
   $("lang").textContent=lang==="zh"?"EN":"中文";
-  $("copy").textContent=t.copy;$("copy").classList.remove("ok");$("dwn").textContent="\u2b07 "+t.dwn;$("q").placeholder=t.q;$("lnk").textContent="\uD83D\uDD17 "+t.lnk;
+  $("copy").textContent=t.copy;$("copy").classList.remove("ok");$("dwn").textContent="\u2b07 "+t.dwn;$("q").placeholder=t.q;$("eco").title=lang==="zh"?"省电模式":"Power saver";$("eco").setAttribute("aria-label",$("eco").title);$("lnk").textContent="\uD83D\uDD17 "+t.lnk;
   drawList();drawView(userSel);if(userSel){keep();userSel=false}var _s=SCRIPTS[cur],_h=_s&&_s.hist?_s.hist.length:0;$("hbtn").hidden=!_h;$("hbtn").textContent="\uD83D\uDD58 "+t.hist+" ("+_h+")";
   $("feat").innerHTML=t.f.map(function(f){return '<div><b>'+f[0]+'</b><h3>'+f[1]+'</h3><p>'+f[2]+'</p></div>'}).join("");
 }
@@ -477,7 +530,8 @@ render();
   function size(){var d=window.devicePixelRatio||1;W=innerWidth;H=innerHeight;cv.width=W*d;cv.height=H*d;x.setTransform(d,0,0,d,0,0);
     P=[];for(var i=0;i<Math.min(90,W/14);i++)P.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.5,vy:(Math.random()-.5)*.5})}
   addEventListener("resize",size);size();
-  (function loop(){
+  window.BGR=true;window.bgLoop=function loop(){
+    if(ECOON()){window.BGR=false;return}
     if(f++%60===0)col=getComputedStyle(document.documentElement).getPropertyValue("--acc").trim()||col;
     sv*=.92;x.clearRect(0,0,W,H);x.fillStyle=x.strokeStyle=col;
     for(var i=0;i<P.length;i++){var p=P[i];
@@ -491,13 +545,13 @@ render();
       if(d<170){x.globalAlpha=(1-d/170)*.6;x.beginPath();x.moveTo(p.x,p.y);x.lineTo(m.x,m.y);x.stroke()}
     }
     requestAnimationFrame(loop);
-  })();
+  };window.bgLoop();
 })();
 
 /* ===== owner-only: add / delete scripts (saves by republishing this page) ===== */
 (function(){
-var L={zh:{add:"＋ 添加脚本",et:"编辑脚本",edit:"✎ 编辑",lkb:"联系方式",lkt:"联系方式（每行一个：名称 | 链接）",lkh:"例如：Discord | https://discord.gg/xxxx",nosrv:"需要连接服务器才能保存",bk:"备份",bkt:"备份和恢复",bkh:"导出会保存所有脚本、历史版本和联系方式。导入时可以「合并」（同名脚本会被覆盖），也可以「全部替换」（联系方式也会一起恢复）。",bke:"⬇ 导出备份",bkp:"⬆ 导入备份文件",bkinfo:"找到 {n} 个脚本、{l} 个联系方式。",bkskip:"（{b} 个无效的已跳过）",bkm1:"合并",bkm2:"全部替换",bksure:"再点一次确认",bkbad:"这不是有效的备份文件",bkmany:"脚本总数不能超过 100 个",big2:"文件太大",tg:"标签，用逗号或空格分隔（可选，最多 5 个）",pn:"📌 置顶这个脚本",badleft:"账号或密码错误，还剩 {n} 次机会",lock:"尝试次数过多，已被锁定。请 {t} 后再试",busy:"服务暂时不可用，请稍后再试",exp:"登录已过期，请重新登录",dl:"⬇ 下载更新后的 index.html",out:"退出",lt:"管理员登录",lu:"账号",lp:"密码",lgb:"登录",bad:"账号或密码错误",del:"删除",sure:"确认删除？",t:"添加你的脚本",n:"文件名，例如 script.lua",dz:"中文说明（可选）",de:"English description (optional)",c:"把代码粘贴在这里，或把文件拖进来…",pick:"从电脑选择文件",save:"保存并发布",x:"取消",ing:"发布中…",need:"请填写文件名和代码",big:"文件太大（最大 400KB）",fail:"失败："},
-en:{add:"＋ Add script",et:"Edit script",edit:"✎ Edit",lkb:"Contact links",lkt:"Contact links (one per line: Name | URL)",lkh:"Example: Discord | https://discord.gg/xxxx",nosrv:"Needs a server connection to save",bk:"Backup",bkt:"Backup & restore",bkh:"Export saves all scripts, version history and contact links. When importing you can Merge (same-name scripts are overwritten) or Replace everything (contact links are restored too).",bke:"⬇ Export backup",bkp:"⬆ Import backup file",bkinfo:"Found {n} scripts and {l} contact links.",bkskip:" ({b} invalid skipped)",bkm1:"Merge",bkm2:"Replace all",bksure:"Click again to confirm",bkbad:"Not a valid backup file",bkmany:"Max 100 scripts in total",big2:"File too large",tg:"Tags, separated by commas or spaces (optional, max 5)",pn:"\uD83D\uDCCC Pin this script to the top",badleft:"Wrong username or password. Attempts left: {n}",lock:"Too many attempts. Locked for {t}",busy:"Service unavailable, try again later",exp:"Session expired, please log in again",dl:"⬇ Download updated index.html",out:"Log out",lt:"Admin login",lu:"Username",lp:"Password",lgb:"Log in",bad:"Wrong username or password",del:"Delete",sure:"Sure?",t:"Add your script",n:"File name, e.g. script.lua",dz:"中文说明 (optional)",de:"English description (optional)",c:"Paste code here, or drop a file…",pick:"Choose file",save:"Save & publish",x:"Cancel",ing:"Publishing…",need:"Name and code are required",big:"File too large (max 400KB)",fail:"Failed: "}};
+var L={zh:{add:"＋ 添加脚本",et:"编辑脚本",edit:"✎ 编辑",lkb:"联系方式",lkt:"联系方式（每行一个：名称 | 链接）",lkh:"例如：Discord | https://discord.gg/xxxx",nosrv:"需要连接服务器才能保存",dc:"使用说明（可选）：怎么用、注意事项。支持 **粗体**、`代码`、- 列表、1. 步骤、## 小标题、[文字](https://链接)",bk:"备份",bkt:"备份和恢复",bkh:"导出会保存所有脚本、历史版本和联系方式。导入时可以「合并」（同名脚本会被覆盖），也可以「全部替换」（联系方式也会一起恢复）。",bke:"⬇ 导出备份",bkp:"⬆ 导入备份文件",bkinfo:"找到 {n} 个脚本、{l} 个联系方式。",bkskip:"（{b} 个无效的已跳过）",bkm1:"合并",bkm2:"全部替换",bksure:"再点一次确认",bkbad:"这不是有效的备份文件",bkmany:"脚本总数不能超过 100 个",big2:"文件太大",tg:"标签，用逗号或空格分隔（可选，最多 5 个）",pn:"📌 置顶这个脚本",badleft:"账号或密码错误，还剩 {n} 次机会",lock:"尝试次数过多，已被锁定。请 {t} 后再试",busy:"服务暂时不可用，请稍后再试",exp:"登录已过期，请重新登录",dl:"⬇ 下载更新后的 index.html",out:"退出",lt:"管理员登录",lu:"账号",lp:"密码",lgb:"登录",bad:"账号或密码错误",del:"删除",sure:"确认删除？",t:"添加你的脚本",n:"文件名，例如 script.lua",dz:"中文说明（可选）",de:"English description (optional)",c:"把代码粘贴在这里，或把文件拖进来…",pick:"从电脑选择文件",save:"保存并发布",x:"取消",ing:"发布中…",need:"请填写文件名和代码",big:"文件太大（最大 400KB）",fail:"失败："},
+en:{add:"＋ Add script",et:"Edit script",edit:"✎ Edit",lkb:"Contact links",lkt:"Contact links (one per line: Name | URL)",lkh:"Example: Discord | https://discord.gg/xxxx",nosrv:"Needs a server connection to save",dc:"Guide (optional): how to use it, notes. Supports **bold**, `code`, - lists, 1. steps, ## headings, [text](https://link)",bk:"Backup",bkt:"Backup & restore",bkh:"Export saves all scripts, version history and contact links. When importing you can Merge (same-name scripts are overwritten) or Replace everything (contact links are restored too).",bke:"⬇ Export backup",bkp:"⬆ Import backup file",bkinfo:"Found {n} scripts and {l} contact links.",bkskip:" ({b} invalid skipped)",bkm1:"Merge",bkm2:"Replace all",bksure:"Click again to confirm",bkbad:"Not a valid backup file",bkmany:"Max 100 scripts in total",big2:"File too large",tg:"Tags, separated by commas or spaces (optional, max 5)",pn:"\uD83D\uDCCC Pin this script to the top",badleft:"Wrong username or password. Attempts left: {n}",lock:"Too many attempts. Locked for {t}",busy:"Service unavailable, try again later",exp:"Session expired, please log in again",dl:"⬇ Download updated index.html",out:"Log out",lt:"Admin login",lu:"Username",lp:"Password",lgb:"Log in",bad:"Wrong username or password",del:"Delete",sure:"Sure?",t:"Add your script",n:"File name, e.g. script.lua",dz:"中文说明 (optional)",de:"English description (optional)",c:"Paste code here, or drop a file…",pick:"Choose file",save:"Save & publish",x:"Cancel",ing:"Publishing…",need:"Name and code are required",big:"File too large (max 400KB)",fail:"Failed: "}};
 var M1="/*DATA_"+"START*/",M2="/*DATA_"+"END*/",art,owner=false,built=false,tries=0,armed=false,editIdx=-1,bkarm=false,BK=null,TOK="";
 try{TOK=sessionStorage.getItem("tok")||""}catch(e){}
 var g=function(i){return document.getElementById(i)};
@@ -512,13 +566,14 @@ function cleanS(s){if(!s||typeof s!=="object")return null;
   if(Number.isInteger(s.t))o.t=s.t;
   if(Array.isArray(s.tags)){var tg=[];s.tags.slice(0,10).forEach(function(x){if(typeof x==="string"){x=x.trim();if(x&&x.length<=20&&tg.indexOf(x)<0)tg.push(x)}});if(tg.length)o.tags=tg.slice(0,5)}
   if(s.pin===true)o.pin=true;
+  if(typeof s.doc==="string"&&s.doc.length<=4000)o.doc=s.doc;
   if(Array.isArray(s.hist)){var h=[];s.hist.slice(0,5).forEach(function(x){if(x&&typeof x.code==="string"&&x.code.length<=400000&&Number.isInteger(x.t))h.push({t:x.t,code:x.code})});if(h.length)o.hist=h}
   return o}
 function commit(arr){
   if(TOK){MS().textContent=L[lang].ing;g("mv").disabled=true;
     fetch("/api/scripts",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+TOK},body:JSON.stringify(arr)})
     .then(function(r){return r.json().catch(function(){return{}}).then(function(j){if(!r.ok)throw j;return j})})
-    .then(function(){SCRIPTS=arr;if(cur>=arr.length)cur=arr.length-1;["mn","mz","me","mc","mtg"].forEach(function(k){g(k).value=""});MS().textContent="";g("mv").disabled=false;g("mdl").classList.remove("on");g("bkm").classList.remove("on");render()})
+    .then(function(){SCRIPTS=arr;if(cur>=arr.length)cur=arr.length-1;["mn","mz","me","mc","mtg","mdoc"].forEach(function(k){g(k).value=""});MS().textContent="";g("mv").disabled=false;g("mdl").classList.remove("on");g("bkm").classList.remove("on");render()})
     .catch(function(e){g("mv").disabled=false;MS().textContent=L[lang].fail+((e&&e.error)||"");if(e&&e.error==="auth"){TOK="";try{sessionStorage.clear()}catch(x){}MS().textContent=L[lang].exp;setTimeout(function(){location.reload()},1500)}});
     return}
   var i=PRISTINE.indexOf(M1),j=PRISTINE.indexOf(M2);
@@ -528,25 +583,25 @@ function commit(arr){
   if(art&&owner){MS().textContent=L[lang].ing;g("mv").disabled=true;
     art.publish(html).catch(function(e){MS().textContent=L[lang].fail+((e&&(e.code||e.message))||"");g("mv").disabled=false;g("mdl").classList.add("on")});return}
   SCRIPTS=arr;if(cur>=arr.length)cur=arr.length-1;PRISTINE=html;
-  ["mn","mz","me","mc","mtg"].forEach(function(k){g(k).value=""});MS().textContent="";g("mdl").classList.remove("on");g("bkm").classList.remove("on");
+  ["mn","mz","me","mc","mtg","mdoc"].forEach(function(k){g(k).value=""});MS().textContent="";g("mdl").classList.remove("on");g("bkm").classList.remove("on");
   g("dlb").style.display="";render();
 }
 function applyL(){var l=L[lang];
   g("addb").textContent=l.add;g("delb").textContent=armed?l.sure:l.del;g("delb").style.display=SCRIPTS.length>1?"":"none";
-  g("mt").textContent=editIdx>=0?l.et:l.t;g("mtg").placeholder=l.tg;g("mpl").textContent=l.pn;g("editb").textContent=l.edit;g("lkb").textContent=l.lkb;g("lkt").textContent=l.lkt;g("lkh").textContent=l.lkh;g("lkc").textContent=l.x;g("lkv").textContent=l.save;g("bkb").textContent=l.bk;g("bkt").textContent=l.bkt;g("bkh").textContent=l.bkh;g("bke").textContent=l.bke;g("bkp").textContent=l.bkp;g("bkx").textContent=l.x;g("bkm1").textContent=l.bkm1;g("bkm2").textContent=bkarm?l.bksure:l.bkm2;g("mn").placeholder=l.n;g("mz").placeholder=l.dz;g("me").placeholder=l.de;g("mc").placeholder=l.c;
+  g("mt").textContent=editIdx>=0?l.et:l.t;g("mtg").placeholder=l.tg;g("mdoc").placeholder=l.dc;g("mpl").textContent=l.pn;g("editb").textContent=l.edit;g("lkb").textContent=l.lkb;g("lkt").textContent=l.lkt;g("lkh").textContent=l.lkh;g("lkc").textContent=l.x;g("lkv").textContent=l.save;g("bkb").textContent=l.bk;g("bkt").textContent=l.bkt;g("bkh").textContent=l.bkh;g("bke").textContent=l.bke;g("bkp").textContent=l.bkp;g("bkx").textContent=l.x;g("bkm1").textContent=l.bkm1;g("bkm2").textContent=bkarm?l.bksure:l.bkm2;g("mn").placeholder=l.n;g("mz").placeholder=l.dz;g("me").placeholder=l.de;g("mc").placeholder=l.c;
   g("mp").textContent=l.pick;g("mv").textContent=l.save;g("mx").textContent=l.x;g("dlb").textContent=l.dl;g("lob").textContent=l.out;var z=lang==="zh";g("md").textContent=TOK?(z?"● 已连接服务器":"● Server connected"):(art&&owner?(z?"● claude.ai 发布模式":"● claude.ai publish"):(z?"○ 仅本地模式（刷新会丢失）":"○ Local only (lost on refresh)"));g("md").style.color=(TOK||(art&&owner))?"var(--acc)":"#ff5d6c"}
 function loadFile(f){if(f.size>409600){g("ms").textContent=L[lang].big;return}
   f.text().then(function(t){g("mc").value=t;if(!g("mn").value)g("mn").value=f.name;g("ms").textContent=""})}
 function build(){
   if(built)return;
   var m=document.createElement("div");m.className="mdl";m.id="mdl";
-  m.innerHTML='<div class="card"><h3 id="mt"></h3><input id="mn" maxlength="80"><input id="mz" maxlength="200"><input id="me" maxlength="200"><input id="mtg" maxlength="120"><label class="pinl"><input type="checkbox" id="mpn"><span id="mpl"></span></label><textarea id="mc" spellcheck="false"></textarea><div class="row2"><label class="ghost"><input type="file" id="mf" hidden><span id="mp"></span></label><span id="ms"></span><span class="sp"></span><button class="ghost" id="mx"></button><button class="copy" id="mv"></button></div></div>';
+  m.innerHTML='<div class="card"><h3 id="mt"></h3><input id="mn" maxlength="80"><input id="mz" maxlength="200"><input id="me" maxlength="200"><input id="mtg" maxlength="120"><label class="pinl"><input type="checkbox" id="mpn"><span id="mpl"></span></label><textarea id="mc" spellcheck="false"></textarea><textarea id="mdoc" spellcheck="false" maxlength="4000" style="min-height:110px"></textarea><div class="row2"><label class="ghost"><input type="file" id="mf" hidden><span id="mp"></span></label><span id="ms"></span><span class="sp"></span><button class="ghost" id="mx"></button><button class="copy" id="mv"></button></div></div>';
   document.body.appendChild(m);
   var a=document.createElement("div");a.className="adm";
   a.innerHTML='<button class="ghost" id="addb"></button><button class="ghost" id="editb"></button><button class="ghost danger" id="delb"></button><button class="ghost" id="bkb"></button><button class="ghost" id="lkb"></button><button class="ghost" id="dlb" style="display:none"></button><button class="ghost" id="lob"></button><span id="md" style="font-size:.8rem;align-self:center"></span>';
   var meta=document.querySelector(".meta");meta.insertBefore(a,g("dwn"));
-  g("addb").onclick=function(){editIdx=-1;["mn","mz","me","mc","mtg"].forEach(function(k){g(k).value=""});g("mpn").checked=false;applyL();g("mdl").classList.add("on")};
-  g("editb").onclick=function(){var o=SCRIPTS[cur];if(!o)return;editIdx=cur;g("mn").value=o.name;g("mz").value=o.zh||"";g("me").value=o.en||"";g("mc").value=o.code;g("mtg").value=(o.tags||[]).join(", ");g("mpn").checked=!!o.pin;applyL();g("mdl").classList.add("on")};
+  g("addb").onclick=function(){editIdx=-1;["mn","mz","me","mc","mtg","mdoc"].forEach(function(k){g(k).value=""});g("mpn").checked=false;applyL();g("mdl").classList.add("on")};
+  g("editb").onclick=function(){var o=SCRIPTS[cur];if(!o)return;editIdx=cur;g("mn").value=o.name;g("mz").value=o.zh||"";g("me").value=o.en||"";g("mc").value=o.code;g("mtg").value=(o.tags||[]).join(", ");g("mpn").checked=!!o.pin;g("mdoc").value=o.doc||"";applyL();g("mdl").classList.add("on")};
   g("mx").onclick=function(){g("mdl").classList.remove("on")};
   m.onclick=function(e){if(e.target===m)m.classList.remove("on")};
   g("mf").onchange=function(){var f=g("mf").files[0];f&&loadFile(f)};
@@ -560,7 +615,7 @@ function build(){
       if(!it.hist.length)delete it.hist;arr[editIdx]=it}
     else arr.push({name:n,zh:z||e,en:e||z,code:c,t:Date.now()});
     var X=arr[editIdx>=0&&SCRIPTS[editIdx]?editIdx:arr.length-1],tgs=parseTags(g("mtg").value);
-    if(tgs.length)X.tags=tgs;else delete X.tags;if(g("mpn").checked)X.pin=true;else delete X.pin;
+    if(tgs.length)X.tags=tgs;else delete X.tags;var dc=g("mdoc").value.trim();if(dc)X.doc=dc;else delete X.doc;if(g("mpn").checked)X.pin=true;else delete X.pin;
     commit(arr)};
   g("delb").onclick=function(){
     if(!armed){armed=true;applyL();setTimeout(function(){armed=false;applyL()},3000)}
@@ -606,7 +661,7 @@ function build(){
     .then(function(){SITE={links:ls};drawLinks();k.classList.remove("on")})
     .catch(function(e){g("lks").textContent=L[lang].fail+((e&&e.error)||"")})};
   window.restoreVersion=function(code){var o=SCRIPTS[cur];if(!o)return;var arr=SCRIPTS.slice();
-    arr[cur]={name:o.name,zh:o.zh,en:o.en,code:code,tags:o.tags,pin:o.pin,t:Date.now(),hist:[{t:o.t||0,code:o.code}].concat(o.hist||[]).slice(0,5)};commit(arr)};
+    arr[cur]={name:o.name,zh:o.zh,en:o.en,code:code,tags:o.tags,pin:o.pin,doc:o.doc,t:Date.now(),hist:[{t:o.t||0,code:o.code}].concat(o.hist||[]).slice(0,5)};commit(arr)};
   g("dlb").onclick=function(){var bl=new Blob([PRISTINE],{type:"text/html"}),a2=document.createElement("a");a2.href=URL.createObjectURL(bl);a2.download="index.html";document.body.appendChild(a2);a2.click();a2.remove()};
   g("lob").onclick=function(){try{sessionStorage.removeItem("adm")}catch(e){}location.reload()};
   built=true;applyL();applyLg();
@@ -667,7 +722,7 @@ boot();
   addEventListener("pointermove",function(e){mx=e.clientX;my=e.clientY;act=true});
   document.addEventListener("pointerleave",function(){mx=-9999;my=-9999});
   (function loop(){
-    if(act){var any=false;
+    if(act&&!ECOON()){var any=false;
       cen.forEach(function(c){var dx=c.x-mx,dy=c.y-my,d=Math.sqrt(dx*dx+dy*dy)||1,k=Math.max(0,1-d/240),f=k*k*95*(1-SPV);
         c.vx+=(dx/d*f-c.vx)*.14;c.vy+=(dy/d*f-c.vy)*.14;
         if(Math.abs(c.vx)>.05||Math.abs(c.vy)>.05)any=true;
@@ -732,6 +787,36 @@ boot();
   addEventListener("hashchange",function(){applyHash(false)});
   fetch("/api/site").then(function(r){return r.ok?r.json():null}).then(function(j){if(j&&Array.isArray(j.links)){SITE=j;drawLinks()}}).catch(function(){});
   render();applyHash(true);
+})();
+
+/* ===== v7: power saver, guide button, ad ===== */
+(function(){
+  var pref=null;try{pref=localStorage.getItem("eco")}catch(e){}
+  var c=navigator.connection||{},auto=!!(c.saveData||(navigator.deviceMemory&&navigator.deviceMemory<=2)||(navigator.hardwareConcurrency&&navigator.hardwareConcurrency<=2)||matchMedia("(prefers-reduced-motion: reduce)").matches);
+  setEco(pref==="1"||(pref===null&&auto),false);
+  $("eco").onclick=function(){setEco(!ECOON(),true)};
+  if(pref===null&&navigator.getBattery)navigator.getBattery().then(function(b){function chk(){if(!b.charging&&b.level<.2&&!ECOON())setEco(true,false)}chk();b.addEventListener("levelchange",chk);b.addEventListener("chargingchange",chk)}).catch(function(){});
+  $("gbtn").onclick=function(){showGuide(!GV)};
+
+  var AD={on:true,secs:8,delay:1500,discord:"shinji17_."},el=$("adv");
+  var AX={zh:{tag:"广告",h:"想推广，或者把你的 OP 脚本放在这里？",p:"私信，或者在 Discord 添加：",cp:"复制",ok:"已复制 ✓",wait:"{n} 秒后可关闭",close:"关闭"},
+          en:{tag:"AD",h:"Want to promote or put your OP script here?",p:"Just DM or add on Discord:",cp:"Copy",ok:"Copied \u2713",wait:"Close in {n}s",close:"Close"}};
+  var left=AD.secs,tmr=null,tries=0;
+  function paint(){var t=AX[lang];$("adtag").textContent=t.tag;$("adt").textContent=t.h;$("adp").textContent=t.p;$("addis").textContent=AD.discord;
+    $("adcp").textContent=t.cp;$("adn").textContent=left>0?left:"\u2713";$("adx").textContent=left>0?t.wait.replace("{n}",left):t.close;$("adx").disabled=left>0;
+    $("adr").style.strokeDashoffset=(119.4*(1-left/AD.secs)).toFixed(1)}
+  function open(){
+    if(document.querySelector(".mdl.on")||document.hidden){if(tries++<10)setTimeout(open,1500);return}
+    try{sessionStorage.setItem("ad","1")}catch(e){}
+    el.hidden=false;document.body.style.overflow="hidden";paint();
+    tmr=setInterval(function(){if(document.hidden)return;left--;paint();if(left<=0){clearInterval(tmr);$("adx").focus()}},1000)}
+  function close(){el.hidden=true;document.body.style.overflow="";clearInterval(tmr)}
+  $("adx").onclick=function(){if(left<=0)close()};
+  $("adcp").onclick=function(){copyText(AD.discord);burst($("adcp"));$("adcp").textContent=AX[lang].ok;setTimeout(function(){$("adcp").textContent=AX[lang].cp},1600)};
+  document.addEventListener("keydown",function(e){if(e.key==="Escape"&&!el.hidden&&left<=0)close()});
+  var _r5=render;render=function(){_r5();if(!el.hidden)paint()};
+  var seen=false,tk="";try{seen=sessionStorage.getItem("ad")==="1";tk=sessionStorage.getItem("tok")||""}catch(e){}
+  if(AD.on&&!seen&&!tk)setTimeout(open,AD.delay);
 })();
 </script>
 </body>
